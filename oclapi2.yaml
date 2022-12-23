@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oclapiservice
+  labels:
+    app: oclapiservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oclapiservice
+  template:
+    metadata:
+      labels:
+        app: oclapiservice
+    spec:
+      containers:
+      - name: oclapiservice
+        image: openconceptlab/oclapi2:nightly
+        envFrom:
+          - secretRef:
+              name: oclapi-secrets
+        ports:
+        - containerPort: 8000
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: oclapiservice
+spec:
+  type: NodePort
+  selector:
+    app: oclapiservice
+  ports:
+  - port: 8000
+    targetPort: 8000
+    nodePort: 30001
+
+# kubectl create secret generic oclapi-secrets --from-env-file=oclapi2.env

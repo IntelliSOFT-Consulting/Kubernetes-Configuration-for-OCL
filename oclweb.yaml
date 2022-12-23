@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oclwebservice
+  labels:
+    app: oclwebservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oclwebservice
+  template:
+    metadata:
+      labels:
+        app: oclwebservice
+    spec:
+      containers:
+      - name: oclwebservice
+        image: openconceptlab/oclweb2:nightly
+        imagePullPolicy: "Always"
+        envFrom:
+          - secretRef:
+              name: oclweb-secrets
+        ports:
+        - containerPort: 4000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oclwebservice
+spec:
+  type: NodePort
+  selector:
+    app: oclwebservice
+  ports:
+  - port: 4000
+    targetPort: 4000
+    nodePort: 30002
+
+# kubectl create secret generic oclweb-secrets --from-env-file=oclweb.env
